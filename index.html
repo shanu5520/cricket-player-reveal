@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cricket Player Random Reveal</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #141e30, #243b55);
+        padding: 20px;
+        color: white;
+    }
+
+    h1 { text-align: center; }
+
+    .box {
+        background: rgba(255,255,255,0.12);
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+    }
+
+    input {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        margin-right: 5px;
+    }
+
+    button {
+        padding: 10px 14px;
+        margin: 6px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background: #ecf0f1;
+        color: black;
+    }
+
+    button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+    }
+
+    .captain1 { background: #e74c3c !important; color: white; }
+    .captain2 { background: #2ecc71 !important; color: white; }
+    .captain3 { background: #f1c40f !important; color: black; }
+    .captain4 { background: #9b59b6 !important; color: white; }
+
+    footer {
+        text-align: center;
+        margin-top: 30px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<h1>Cricket Player Reveal System</h1>
+
+<div class="box">
+    <h3>Upload Player List (.txt)</h3>
+    <input type="file" id="fileInput">
+</div>
+
+<div class="box">
+    <h3>Add Player Manually</h3>
+    <input type="text" id="playerName" placeholder="Type name & press Enter">
+    <button onclick="addPlayer()">Add</button>
+</div>
+
+<div class="box">
+    <h3>Players</h3>
+    <div id="playerButtons"></div>
+</div>
+
+<footer>
+    Made by Abhishek Kumar Verma
+</footer>
+
+<script>
+    let players = [];
+    let shuffledPlayers = [];
+    let selectCount = 0;
+    const colors = ["captain1", "captain2", "captain3", "captain4"];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function renderButtons() {
+        const container = document.getElementById("playerButtons");
+        container.innerHTML = "";
+
+        shuffledPlayers = [...players];
+        shuffle(shuffledPlayers);
+
+        for (let i = 0; i < players.length; i++) {
+            const btn = document.createElement("button");
+            btn.innerText = "Player " + (i + 1);
+            btn.onclick = () => reveal(btn, i);
+            container.appendChild(btn);
+        }
+    }
+
+    function addPlayer() {
+        const input = document.getElementById("playerName");
+        const name = input.value.trim();
+        if (name !== "") {
+            players.push(name);
+            input.value = "";
+            renderButtons();
+        }
+    }
+
+    function reveal(button, index) {
+        const colorClass = colors[selectCount % 4];
+        button.innerText = shuffledPlayers[index];
+        button.classList.add(colorClass);
+        button.disabled = true;
+        selectCount++;
+    }
+
+    document.getElementById("playerName").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            addPlayer();
+        }
+    });
+
+    document.getElementById("fileInput").addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            const lines = reader.result.split("\n");
+            lines.forEach(line => {
+                const name = line.trim();
+                if (name !== "") {
+                    players.push(name);
+                }
+            });
+            renderButtons();
+        };
+        reader.readAsText(file);
+    });
+</script>
+
+</body>
+</html>
